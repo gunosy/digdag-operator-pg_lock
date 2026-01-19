@@ -1,15 +1,20 @@
 name: Test CI
 
 on:
-  - push
+  push:
+    branches:
+      - master
+      - "feature/**"
+  pull_request:
+    branches:
+      - master
 
 jobs:
   test:
-
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:10
+        image: postgres:17
         ports:
           - 5432:5432
         env:
@@ -26,3 +31,9 @@ jobs:
           java-version: 1.8
       - name: Test with Gradle
         run: ./gradlew test
+        env:
+          PG_LOCK_HOST: localhost
+          PG_LOCK_PORT: 5432
+          PG_LOCK_DATABASE: digdag
+          PG_LOCK_USER: digdag
+          PG_LOCK_PASSWORD: digdag
