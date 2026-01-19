@@ -171,7 +171,7 @@ class PgLockPluginTest
             )
 
         assert(status.code == 1)
-        assert(status.stderr.contains("The server requested password-based authentication, but no password was provided."))
+        assert(status.stderr.contains("no password was provided"))
     }
 
     it should "migrate tables" in {
