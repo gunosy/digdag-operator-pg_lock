@@ -15,7 +15,7 @@ _export:
     repositories:
       - https://jitpack.io
     dependencies:
-      - pro.civitaspo:digdag-operator-pg_lock:0.0.3
+      - com.github.Gunosy:digdag-operator-pg_lock:0.0.3
 
 +lock-with:
   # Wait during 5m until getting the named lock if another task locks.
@@ -109,6 +109,32 @@ s)?\s*`.
     * This problem is resolved by [treasure-data/digdag \[feature request\] Lifecycle management plugin interface OR Global resource management plugin interface #1238](https://github.com/treasure-data/digdag/issues/1238)
 
 # Development
+
+## Build with Docker
+
+To avoid installing Java/Gradle on your local machine, you can use Docker to build the plugin.
+
+```bash
+# 1. Build the docker image
+docker build -t digdag-pg-lock-builder .
+
+# 2. Run build and get the JAR file
+# This will output the JAR to build/libs/digdag-operator-pg_lock-0.0.3.jar
+docker run --rm -v "$PWD/build:/app/build" digdag-pg-lock-builder
+```
+
+## How to use this fork via JitPack
+
+Add JitPack repository and the dependency to your `.dig` file:
+
+```yaml
+_export:
+  plugin:
+    repositories:
+      - https://jitpack.io
+    dependencies:
+      - com.github.Gunosy:digdag-operator-pg_lock:0.0.3
+```
 
 ## Run an Example
 
