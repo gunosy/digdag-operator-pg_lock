@@ -1,4 +1,4 @@
-0.1.0 (2025-01-19)
+0.1.0 (2026-01-19)
 ==================
 
 * [Breaking Change] Change Group ID to `com.github.Gunosy` and package to `com.github.gunosy.digdag.plugin.pg_lock`.
