@@ -15,7 +15,7 @@ _export:
     repositories:
       - https://jitpack.io
     dependencies:
-      - com.github.Gunosy:digdag-operator-pg_lock:0.0.3
+      - com.github.Gunosy:digdag-operator-pg_lock:0.1.0
 
 +lock-with:
   # Wait during 5m until getting the named lock if another task locks.
@@ -119,7 +119,7 @@ To avoid installing Java/Gradle on your local machine, you can use Docker to bui
 docker build -t digdag-pg-lock-builder .
 
 # 2. Run build and get the JAR file
-# This will output the JAR to build/libs/digdag-operator-pg_lock-0.0.3.jar
+# This will output the JAR to build/libs/digdag-operator-pg_lock-0.1.0.jar
 docker run --rm -v "$PWD/build:/app/build" digdag-pg-lock-builder
 ```
 
@@ -141,7 +141,7 @@ _export:
     repositories:
       - https://jitpack.io
     dependencies:
-      - com.github.Gunosy:digdag-operator-pg_lock:0.0.3
+      - com.github.Gunosy:digdag-operator-pg_lock:0.1.0
 ```
 
 ## Run an Example
