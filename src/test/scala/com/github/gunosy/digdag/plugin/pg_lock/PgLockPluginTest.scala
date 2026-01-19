@@ -8,7 +8,8 @@ import java.util.Properties
 
 import com.google.common.io.Files
 import org.junit.runner.RunWith
-import org.scalatest.{BeforeAndAfter, DiagrammedAssertions, FlatSpec}
+import org.scalatest.BeforeAndAfter
+import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatestplus.junit.JUnitRunner
 import com.github.gunosy.digdag.plugin.pg_lock.DigdagTestUtils.{digdagRun, readResource, CommandStatus}
 
@@ -18,9 +19,8 @@ import scala.util.matching.Regex
 
 @RunWith(classOf[JUnitRunner])
 class PgLockPluginTest
-    extends FlatSpec
+    extends AnyFlatSpec
         with BeforeAndAfter
-        with DiagrammedAssertions
 {
     val digdagPgLockProps: Properties = new Properties()
     var tmpDir: File = _
@@ -59,6 +59,13 @@ class PgLockPluginTest
     before {
         Using.resource(new StringReader(readResource("/digdag.properties"))) { reader =>
             digdagPgLockProps.load(reader)
+        }
+        // Override from Environment variables if available (e.g. for Docker Compose)
+        List("host", "port", "database", "user", "password").foreach { key =>
+            val envKey = s"PG_LOCK_${key.toUpperCase}"
+            Option(System.getenv(envKey)).foreach { value =>
+                digdagPgLockProps.setProperty(s"pg_lock.$key", value)
+            }
         }
         Using.resource(getJdbcPostgresConnection) { conn =>
             // recreate database
@@ -103,7 +110,7 @@ class PgLockPluginTest
             digString = digString
             )
 
-        assert(status.code === 1)
+        assert(status.code == 1)
         assert(status.stderr.contains("Parameter 'pg_lock.host' is required but not set"))
     }
 
@@ -123,7 +130,7 @@ class PgLockPluginTest
             digString = digString
             )
 
-        assert(status.code === 1)
+        assert(status.code == 1)
         assert(status.stderr.contains("Parameter 'pg_lock.database' is required but not set"))
     }
 
@@ -143,7 +150,7 @@ class PgLockPluginTest
             digString = digString
             )
 
-        assert(status.code === 1)
+        assert(status.code == 1)
         assert(status.stderr.contains("Parameter 'pg_lock.user' is required but not set"))
     }
 
@@ -163,7 +170,7 @@ class PgLockPluginTest
             digString = digString
             )
 
-        assert(status.code === 1)
+        assert(status.code == 1)
         assert(status.stderr.contains("The server requested password-based authentication, but no password was provided."))
     }
 
@@ -176,7 +183,7 @@ class PgLockPluginTest
             digString = digString
             )
 
-        assert(status.code === 0)
+        assert(status.code == 0)
 
         Using.resource(getJdbcPgLockConnection) { conn =>
             Using.resource(conn.createStatement()) { stmt =>
@@ -194,9 +201,9 @@ class PgLockPluginTest
                     .map(_.getString("table_name"))
                     .toSeq
 
-                assert(tableNames.size === 2)
-                assert(tableNames(0) === "digdag_pg_locks")
-                assert(tableNames(1) === "pg_lock_schema_migrations")
+                assert(tableNames.size == 2)
+                assert(tableNames(0) == "digdag_pg_locks")
+                assert(tableNames(1) == "pg_lock_schema_migrations")
             }
         }
 
@@ -215,7 +222,7 @@ class PgLockPluginTest
                     .map(_.getString("description"))
                     .toSeq
                     .head
-                assert(description === "Baseline do nothing")
+                assert(description == "Baseline do nothing")
             }
         }
 
@@ -256,16 +263,16 @@ class PgLockPluginTest
                     }
 
                 assert(idxCols.contains("digdag_pg_locks_pkey"))
-                assert(idxCols.getOrElse("digdag_pg_locks_pkey", Seq()) === Seq("id"))
+                assert(idxCols.getOrElse("digdag_pg_locks_pkey", Seq()) == Seq("id"))
 
                 assert(idxCols.contains("digdag_pg_locks_idx_named_locks"))
-                assert(idxCols.getOrElse("digdag_pg_locks_idx_named_locks", Seq()) === Seq("namespace_type", "namespace_value", "name"))
+                assert(idxCols.getOrElse("digdag_pg_locks_idx_named_locks", Seq()) == Seq("namespace_type", "namespace_value", "name"))
 
                 assert(idxCols.contains("digdag_pg_locks_idx_expires_on"))
-                assert(idxCols.getOrElse("digdag_pg_locks_idx_expires_on", Seq()) === Seq("expires_on"))
+                assert(idxCols.getOrElse("digdag_pg_locks_idx_expires_on", Seq()) == Seq("expires_on"))
 
                 assert(idxCols.contains("digdag_pg_locks_idx_owner_attempt_id"))
-                assert(idxCols.getOrElse("digdag_pg_locks_idx_owner_attempt_id", Seq()) === Seq("owner_attempt_id"))
+                assert(idxCols.getOrElse("digdag_pg_locks_idx_owner_attempt_id", Seq()) == Seq("owner_attempt_id"))
             }
         }
 
@@ -285,7 +292,7 @@ class PgLockPluginTest
             digString = digString
             )
 
-        assert(status.code === 0)
+        assert(status.code == 0)
 
         Using.resource(getJdbcPgLockConnection) { conn =>
             Using.resource(conn.createStatement()) { stmt =>
@@ -303,9 +310,9 @@ class PgLockPluginTest
                     .map(_.getString("table_name"))
                     .toSeq
 
-                assert(tableNames.size === 2)
-                assert(tableNames(0) === "digdag_pg_locks")
-                assert(tableNames(1) === "pg_lock_schema_migrations")
+                assert(tableNames.size == 2)
+                assert(tableNames(0) == "digdag_pg_locks")
+                assert(tableNames(1) == "pg_lock_schema_migrations")
             }
         }
 
@@ -324,7 +331,7 @@ class PgLockPluginTest
                     .map(_.getString("description"))
                     .toSeq
                     .head
-                assert(description === "<< Flyway Baseline >>")
+                assert(description == "<< Flyway Baseline >>")
             }
         }
 
@@ -365,16 +372,16 @@ class PgLockPluginTest
                     }
 
                 assert(idxCols.contains("digdag_pg_locks_pkey"))
-                assert(idxCols.getOrElse("digdag_pg_locks_pkey", Seq()) === Seq("id"))
+                assert(idxCols.getOrElse("digdag_pg_locks_pkey", Seq()) == Seq("id"))
 
                 assert(idxCols.contains("digdag_pg_locks_idx_named_locks"))
-                assert(idxCols.getOrElse("digdag_pg_locks_idx_named_locks", Seq()) === Seq("namespace_type", "namespace_value", "name"))
+                assert(idxCols.getOrElse("digdag_pg_locks_idx_named_locks", Seq()) == Seq("namespace_type", "namespace_value", "name"))
 
                 assert(idxCols.contains("digdag_pg_locks_idx_expires_on"))
-                assert(idxCols.getOrElse("digdag_pg_locks_idx_expires_on", Seq()) === Seq("expires_on"))
+                assert(idxCols.getOrElse("digdag_pg_locks_idx_expires_on", Seq()) == Seq("expires_on"))
 
                 assert(idxCols.contains("digdag_pg_locks_idx_owner_attempt_id"))
-                assert(idxCols.getOrElse("digdag_pg_locks_idx_owner_attempt_id", Seq()) === Seq("owner_attempt_id"))
+                assert(idxCols.getOrElse("digdag_pg_locks_idx_owner_attempt_id", Seq()) == Seq("owner_attempt_id"))
             }
         }
     }
@@ -389,7 +396,7 @@ class PgLockPluginTest
             digString = digString
             )
 
-        assert(status.code === 1)
+        assert(status.code == 1)
         val expectedPattern: Regex = """\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} \+\d{4} \[ERROR\] \(.+?\+main\+wait-timeout\+failure\+lock\): Task failed with unexpected error: Give up polling\.""".r
         assert(expectedPattern.findFirstIn(status.log.get).isDefined)
     }
@@ -403,7 +410,7 @@ class PgLockPluginTest
             digString = digString
             )
 
-        assert(status.code === 0)
+        assert(status.code == 0)
         val expectedPattern: Regex = """\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} \+\d{4} \[INFO\] \(.+?\+main\+limit\+lock-wait\+lock\): Wait because current lock count=2 reaches the limit=2\. \(namespace_type: site, namespace_value: .+?, name: lock\)""".r
         assert(expectedPattern.findFirstIn(status.log.get).isDefined)
     }
@@ -417,7 +424,7 @@ class PgLockPluginTest
             digString = digString
             )
 
-        assert(status.code === 1)
+        assert(status.code == 1)
         val expectedPattern: Regex = """\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} \+\d{4} \[ERROR\] \(.+?\+main\+conflict-limit\+limit-2\+lock\): Configuration error at task \+main\+conflict-limit\+limit-2\+lock: Conflict current config: limit=2 because another workflow defines limit=1\. \(config\)""".r
         assert(expectedPattern.findFirstIn(status.log.get).isDefined)
     }
@@ -465,7 +472,7 @@ class PgLockPluginTest
             digString = digString
             )
 
-        assert(status.code === 0)
+        assert(status.code == 0)
         assert(status.log.get.contains("Skip to release the other locks that other attempts are the owner of because unlock_finished_attempt_locks=false."))
     }
 }
