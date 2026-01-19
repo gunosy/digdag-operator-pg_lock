@@ -1,5 +1,5 @@
 # digdag-operator-pg_lock
-[![Jitpack](https://jitpack.io/v/pro.civitaspo/digdag-operator-pg_lock.svg)](https://jitpack.io/#pro.civitaspo/digdag-operator-pg_lock) ![Test CI Status Badge](https://github.com/civitaspo/digdag-operator-pg_lock/workflows/Test%20CI/badge.svg) [![Digdag](https://img.shields.io/badge/digdag-v0.9.39-brightgreen.svg)](https://github.com/treasure-data/digdag/releases/tag/v0.9.39)
+[![Jitpack](https://jitpack.io/v/com.github.Gunosy/digdag-operator-pg_lock.svg)](https://jitpack.io/#com.github.Gunosy/digdag-operator-pg_lock) ![Test CI Status Badge](https://github.com/Gunosy/digdag-operator-pg_lock/workflows/Test%20CI/badge.svg) [![Digdag](https://img.shields.io/badge/digdag-v0.10.5-brightgreen.svg)](https://github.com/treasure-data/digdag/releases/tag/v0.10.5)
 
 A digdag plugin to run digdag tasks with locks by PostgreSQL.
 
@@ -121,6 +121,14 @@ docker build -t digdag-pg-lock-builder .
 # 2. Run build and get the JAR file
 # This will output the JAR to build/libs/digdag-operator-pg_lock-0.0.3.jar
 docker run --rm -v "$PWD/build:/app/build" digdag-pg-lock-builder
+```
+
+## Run Tests with Docker
+
+To run tests without a local Java/PostgreSQL environment:
+
+```bash
+docker compose -f docker-compose.test.yml up --build --exit-code-from tester
 ```
 
 ## How to use this fork via JitPack
