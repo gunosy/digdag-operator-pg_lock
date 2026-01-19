@@ -4,19 +4,15 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '5.1.0'
 }
 
-group = 'pro.civitaspo'
+group = 'com.github.Gunosy'
 version = '0.0.3'
 
-def digdagVersion = '0.9.39'
+def digdagVersion = '0.10.5'
 def scalaSemanticVersion = "2.13.0"
 def depScalaVersion = "2.13"
 
 repositories {
     mavenCentral()
-    jcenter()
-    maven {
-        url 'https://dl.bintray.com/digdag/maven'
-    }
 }
 
 dependencies {
