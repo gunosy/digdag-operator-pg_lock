@@ -1,2 +1,2 @@
-pro.civitaspo.digdag.plugin.pg_lock.PgLockPlugin
+com.github.gunosy.digdag.plugin.pg_lock.PgLockPlugin
 

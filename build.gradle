@@ -4,19 +4,15 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '5.1.0'
 }
 
-group = 'pro.civitaspo'
+group = 'com.github.Gunosy'
 version = '0.0.3'
 
-def digdagVersion = '0.9.39'
-def scalaSemanticVersion = "2.13.0"
+def digdagVersion = '0.10.5'
+def scalaSemanticVersion = "2.13.12"
 def depScalaVersion = "2.13"
 
 repositories {
     mavenCentral()
-    jcenter()
-    maven {
-        url 'https://dl.bintray.com/digdag/maven'
-    }
 }
 
 dependencies {
@@ -25,16 +21,18 @@ dependencies {
     compile group: 'io.digdag', name: 'digdag-plugin-utils', version: digdagVersion
 
     // Follow digdag core dependencies. These are used only when compiling.
-    // ref. https://github.com/treasure-data/digdag/tree/v0.9.39/digdag-core/build.gradle#L16-L17
+    // ref. https://github.com/treasure-data/digdag/tree/v0.10.5/digdag-core/build.gradle
     compile group: 'org.jdbi', name: 'jdbi', version: '2.75'
-    compile group: 'com.zaxxer', name: 'HikariCP', version: '2.4.7'
+    compile group: 'com.zaxxer', name: 'HikariCP', version: '4.0.3'
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.7.4'
 
     compile group: 'org.scala-lang', name: 'scala-library', version: scalaSemanticVersion
-    compile group: 'org.flywaydb', name: 'flyway-core', version: '6.0.4'
-    compile group: 'com.typesafe.scala-logging', name: "scala-logging_$depScalaVersion", version: '3.9.2'
+    compile group: 'org.flywaydb', name: 'flyway-core', version: '7.9.1'
+    compile group: 'com.typesafe.scala-logging', name: "scala-logging_$depScalaVersion", version: '3.9.5'
 
-    testCompile group: 'org.scalatest', name: "scalatest_$depScalaVersion", version: '3.0.8'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'org.scalatest', name: "scalatest_$depScalaVersion", version: '3.2.17'
+    testCompile group: 'org.scalatestplus', name: "junit-4-13_$depScalaVersion", version: '3.2.17.0'
+    testCompile group: 'junit', name: 'junit', version: '4.13.2'
     testCompile group: 'io.digdag', name: 'digdag-cli', version: digdagVersion
 }
 
@@ -46,6 +44,8 @@ shadowJar {
         exclude(dependency('com.google.inject:.*:.*'))
         exclude(dependency('org.jdbi:jdbi:.*'))
         exclude(dependency('com.zaxxer:HikariCP:.*'))
+        exclude(dependency('org.postgresql:postgresql:.*'))
+        exclude(dependency('org.slf4j:slf4j-api:.*'))
     }
 }
 

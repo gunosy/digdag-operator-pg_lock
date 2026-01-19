@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: digdag
+      POSTGRES_PASSWORD: digdag
+      POSTGRES_DB: postgres
+      POSTGRES_INITDB_ARGS: "--auth-host password --auth-local password"
+    ports:
+      - "5432:5432"
+
+  tester:
+    build: .
+    volumes:
+      - .:/app
+      - gradle-cache:/root/.gradle
+    environment:
+      - PG_LOCK_HOST=db
+      - PG_LOCK_PORT=5432
+      - PG_LOCK_USER=digdag
+      - PG_LOCK_PASSWORD=digdag
+      - PG_LOCK_DATABASE=digdag
+    depends_on:
+      - db
+    command: ["/bin/bash", "-c", "sleep 5 && ./gradlew test --info --no-daemon"]
+
+volumes:
+  gradle-cache:
