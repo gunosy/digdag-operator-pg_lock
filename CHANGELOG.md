@@ -1,3 +1,13 @@
+0.1.0 (2026-01-19)
+==================
+
+* [Breaking Change] Change Group ID to `com.github.Gunosy` and package to `com.github.gunosy.digdag.plugin.pg_lock`.
+* [Enhancement] Upgrade Digdag to 0.10.5.
+* [Enhancement] Upgrade Scala to 2.13.12.
+* [Enhancement] Support PostgreSQL 17.
+* [Enhancement] Migrate tests to ScalaTest 3.2.17.
+* [Enhancement] Support GitHub Actions CI.
+
 0.0.3 (2019-11-29)
 ==================
 
