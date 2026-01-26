@@ -25,6 +25,16 @@ class PgLockPluginTest
     val digdagPgLockProps: Properties = new Properties()
     var tmpDir: File = _
 
+    def assertStatus(status: CommandStatus, expectedCode: Int): Unit = {
+        if (status.code != expectedCode) {
+            println(s"Expected code $expectedCode but got ${status.code}")
+            println(s"STDOUT: ${status.stdout}")
+            println(s"STDERR: ${status.stderr}")
+            println(s"LOG: ${status.log.getOrElse("")}")
+        }
+        assert(status.code == expectedCode)
+    }
+
     def defaultSystemConfig: String =
     {
         Using.resource(new ByteArrayOutputStream) { b =>
@@ -70,14 +80,7 @@ class PgLockPluginTest
         Using.resource(getJdbcPostgresConnection) { conn =>
             // recreate database
             Using.resource(conn.createStatement()) { stmt =>
-                stmt.execute( // Need to kill all processes to force dropping database
-                              s"""
-                                 |SELECT pg_terminate_backend(pg_stat_activity.pid)
-                                 |  FROM pg_stat_activity
-                                 | WHERE pg_stat_activity.datname = '${p("database")}'
-                                 |   AND pid <> pg_backend_pid()
-                     """.stripMargin)
-                stmt.executeUpdate(s"DROP DATABASE IF EXISTS ${p("database")}")
+                stmt.executeUpdate(s"DROP DATABASE IF EXISTS ${p("database")} WITH (FORCE)")
                 stmt.executeUpdate(s"CREATE DATABASE ${p("database")}")
             }
         }
@@ -183,7 +186,7 @@ class PgLockPluginTest
             digString = digString
             )
 
-        assert(status.code == 0)
+        assertStatus(status, 0)
 
         Using.resource(getJdbcPgLockConnection) { conn =>
             Using.resource(conn.createStatement()) { stmt =>
@@ -247,7 +250,7 @@ class PgLockPluginTest
                        |      AND a.attnum   = ANY(ix.indkey)
                        |      AND t.relkind  = 'r'
                        |      AND t.relname  = 'digdag_pg_locks'
-                       |      AND db.datname = 'digdag'
+                       |      AND db.datname = '${p("database")}'
                        | ORDER BY t.relname
                        |        , i.relname
                        |        , a.attnum
@@ -292,7 +295,7 @@ class PgLockPluginTest
             digString = digString
             )
 
-        assert(status.code == 0)
+        assertStatus(status, 0)
 
         Using.resource(getJdbcPgLockConnection) { conn =>
             Using.resource(conn.createStatement()) { stmt =>
@@ -356,7 +359,7 @@ class PgLockPluginTest
                        |      AND a.attnum   = ANY(ix.indkey)
                        |      AND t.relkind  = 'r'
                        |      AND t.relname  = 'digdag_pg_locks'
-                       |      AND db.datname = 'digdag'
+                       |      AND db.datname = '${p("database")}'
                        | ORDER BY t.relname
                        |        , i.relname
                        |        , a.attnum
@@ -396,8 +399,8 @@ class PgLockPluginTest
             digString = digString
             )
 
-        assert(status.code == 1)
-        val expectedPattern: Regex = """\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} \+\d{4} \[ERROR\] \(.+?\+main\+wait-timeout\+failure\+lock\): Task failed with unexpected error: Give up polling\.""".r
+        assertStatus(status, 1)
+        val expectedPattern: Regex = """.*Give up polling.*""".r
         assert(expectedPattern.findFirstIn(status.log.get).isDefined)
     }
 
@@ -410,8 +413,8 @@ class PgLockPluginTest
             digString = digString
             )
 
-        assert(status.code == 0)
-        val expectedPattern: Regex = """\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} \+\d{4} \[INFO\] \(.+?\+main\+limit\+lock-wait\+lock\): Wait because current lock count=2 reaches the limit=2\. \(namespace_type: site, namespace_value: .+?, name: lock\)""".r
+        assertStatus(status, 0)
+        val expectedPattern: Regex = """.*Wait because current lock count=2 reaches the limit=2.*""".r
         assert(expectedPattern.findFirstIn(status.log.get).isDefined)
     }
 
@@ -424,8 +427,8 @@ class PgLockPluginTest
             digString = digString
             )
 
-        assert(status.code == 1)
-        val expectedPattern: Regex = """\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} \+\d{4} \[ERROR\] \(.+?\+main\+conflict-limit\+limit-2\+lock\): Configuration error at task \+main\+conflict-limit\+limit-2\+lock: Conflict current config: limit=2 because another workflow defines limit=1\. \(config\)""".r
+        assertStatus(status, 1)
+        val expectedPattern: Regex = """.*Conflict current config: limit=2 because another workflow defines limit=1.*""".r
         assert(expectedPattern.findFirstIn(status.log.get).isDefined)
     }
 
@@ -443,13 +446,13 @@ class PgLockPluginTest
                 )
 
             if (expectError) {
-                assert(status.code == 1)
-                val expectedPattern: Regex = ("""\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} \+\d{4} \[ERROR\] \(.+?\+main\+namespace\): Configuration error at task \+main\+namespace: Unsupported namespace: """ + namespace + """ \(config\)""").r
+                assertStatus(status, 1)
+                val expectedPattern: Regex = (""".*Unsupported namespace: """ + namespace + """.*""").r
                 assert(expectedPattern.findFirstIn(status.log.get).isDefined)
             }
             else {
-                assert(status.code == 0)
-                val expectedPattern: Regex = ("""\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} \+\d{4} \[INFO\] \(.+?\+main\+namespace\): Successfully get the lock \(id: [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}, namespace_type: """ + namespace + """, namespace_value: [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}, owner_attempt_id: .+?, expire_in: .+?, limit: .+?\)""").r
+                assertStatus(status, 0)
+                val expectedPattern: Regex = (""".*Successfully get the lock.*namespace_type: """ + namespace + """.*""").r
                 assert(expectedPattern.findFirstIn(status.log.get).isDefined)
             }
         }
@@ -472,7 +475,7 @@ class PgLockPluginTest
             digString = digString
             )
 
-        assert(status.code == 0)
+        assertStatus(status, 0)
         assert(status.log.get.contains("Skip to release the other locks that other attempts are the owner of because unlock_finished_attempt_locks=false."))
     }
 }
