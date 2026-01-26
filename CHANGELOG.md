@@ -1,3 +1,14 @@
+0.1.1 (2026-01-26)
+==================
+
+* [Enhancement] Upgrade Flyway to 8.5.13 for PostgreSQL 17 compatibility while maintaining Java 8 support.
+* [Enhancement] Optimize HikariCP connection pool settings to prevent connection slot exhaustion in test environments.
+* [Fix] Update database cleanup in tests to use PostgreSQL 13+ `DROP DATABASE ... WITH (FORCE)` syntax.
+* [Fix] Fix hardcoded database name in test SQL queries to support environment variable overrides.
+* [Fix] Relax log pattern matching in tests for better compatibility with Digdag 0.10.x log format.
+* [Fix] Remove `clean` task from Docker build to avoid permission issues with volume mounts.
+* [Enhancement] Add debugging helper for test failures.
+
 0.1.0 (2026-01-19)
 ==================
 
