@@ -22,4 +22,4 @@ COPY src src
 
 # デフォルトで shadowJar（プラグイン用JAR）を作成し、ホスト側に作成されるようにする
 # マウントした build ディレクトリに出力されるよう調整
-CMD ["./gradlew", "clean", "shadowJar", "--no-daemon"]
+CMD ["./gradlew", "shadowJar", "--no-daemon"]
