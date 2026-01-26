@@ -27,7 +27,7 @@ dependencies {
     compile group: 'org.postgresql', name: 'postgresql', version: '42.7.4'
 
     compile group: 'org.scala-lang', name: 'scala-library', version: scalaSemanticVersion
-    compile group: 'org.flywaydb', name: 'flyway-core', version: '7.9.1'
+    compile group: 'org.flywaydb', name: 'flyway-core', version: '8.5.13'
     compile group: 'com.typesafe.scala-logging', name: "scala-logging_$depScalaVersion", version: '3.9.5'
 
     testCompile group: 'org.scalatest', name: "scalatest_$depScalaVersion", version: '3.2.17'
